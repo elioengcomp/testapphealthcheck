@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 )
 
@@ -17,6 +19,12 @@ func healthcheck(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	log.Print("Starting testappheathcheck...")
+
+	var err error
+	if len(os.Args) > 1 {
+		maxTicks, err = strconv.Atoi(os.Args[1])
+	}
+	log.Printf("Max ticks: %d", maxTicks)
 
 	ticker := time.NewTicker(time.Second)
 	go func() {
@@ -33,7 +41,7 @@ func main() {
 	}()
 
 	http.HandleFunc("/healthcheck", healthcheck)
-	err := http.ListenAndServe(":80", nil)
+	err = http.ListenAndServe(":80", nil)
 	if err != nil {
 		panic(err)
 	}
