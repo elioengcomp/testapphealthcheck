@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var maxTicks = 10
+var maxTicks = 12
 var ticks = 0
 
 func healthcheck(w http.ResponseWriter, req *http.Request) {
@@ -35,13 +35,18 @@ func main() {
 	maxTicks, err = strconv.Atoi(os.Args[1])
 	log.Printf("Max ticks: %d", maxTicks)
 
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
-				log.Print("Increasing ticks...")
+				log.Print("Tick...")
 				ticks++
+				resp, err := http.Get("https://search.gocenter.io/api/ui/search?name_fragment=elio")
+				if err != nil {
+					log.Printf("Failed to send request: Response: %d Error: %s", resp.StatusCode, err)
+				}
+				defer resp.Body.Close()
 				if ticks >= maxTicks {
 					log.Print("App has run out of ticks. Shuting down...")
 					panic("App has run out of ticks")
