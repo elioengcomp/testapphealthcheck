@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/syslog"
 	"net/http"
 	"os"
 	"strconv"
@@ -18,12 +19,20 @@ func healthcheck(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	logOutput := os.Args[2]
+	if logOutput == "syslog" {
+		logwriter, e := syslog.New(syslog.LOG_NOTICE, "testappheathcheck")
+		if e != nil {
+			panic(fmt.Sprint("Syslog not available: %w", e))
+		} else {
+			log.SetOutput(logwriter)
+		}
+	}
+
 	log.Print("Starting testappheathcheck...")
 
 	var err error
-	if len(os.Args) > 1 {
-		maxTicks, err = strconv.Atoi(os.Args[1])
-	}
+	maxTicks, err = strconv.Atoi(os.Args[1])
 	log.Printf("Max ticks: %d", maxTicks)
 
 	ticker := time.NewTicker(time.Second)
