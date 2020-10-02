@@ -43,6 +43,7 @@ func main() {
 				log.Print("Increasing ticks...")
 				ticks++
 				if ticks >= maxTicks {
+					log.Print("App has run out of ticks. Shuting down...")
 					panic("App has run out of ticks")
 				}
 			}
