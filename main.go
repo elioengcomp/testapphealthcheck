@@ -33,5 +33,8 @@ func main() {
 	}()
 
 	http.HandleFunc("/healthcheck", healthcheck)
-	http.ListenAndServe(":80", nil)
+	err := http.ListenAndServe(":80", nil)
+	if err != nil {
+		panic(err)
+	}
 }
